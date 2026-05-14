@@ -6,274 +6,525 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin — MH Échange</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body class="admin-body">
-    <div class="admin-layout">
-        <aside class="admin-sidebar">
-            <div class="sidebar-brand">
-                <div class="sidebar-logo">MH</div>
-                <div class="sidebar-brand-text">
-                    <span>MH Échange</span>
-                    <small>Administration</small>
-                </div>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="?type=all" class="sidebar-link {% if type_filter == 'all' or not type_filter %}active{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    Toutes les demandes
-                </a>
-                <a href="?type=deposits" class="sidebar-link {% if type_filter == 'deposits' %}active{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-                    Dépôts
-                    {% if deposits.count %}<span class="badge">{{ deposits.count }}</span>{% endif %}
-                </a>
-                <a href="?type=withdrawals" class="sidebar-link {% if type_filter == 'withdrawals' %}active{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-                    Retraits
-                    {% if withdrawals.count %}<span class="badge">{{ withdrawals.count }}</span>{% endif %}
-                </a>
-            </nav>
-            <div class="sidebar-footer">
-                <a href="{% url 'home' %}" class="sidebar-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    Site public
-                </a>
-                <a href="{% url 'admin_logout' %}" class="sidebar-link sidebar-logout">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                    Déconnexion
-                </a>
-            </div>
-        </aside>
+<div class="admin-layout">
 
-        <main class="admin-main">
-            <header class="admin-header">
-                <div class="admin-header-left">
-                    <button class="menu-toggle" onclick="toggleSidebar()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-                    </button>
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo">MH</div>
+            <div class="sidebar-brand-text">
+                <span>MH Échange</span>
+                <small>Administration</small>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="?type=all" class="sidebar-link {% if type_filter == 'all' or not type_filter %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                Vue d'ensemble
+            </a>
+            <a href="?type=deposits" class="sidebar-link {% if type_filter == 'deposits' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+                Dépôts
+                {% if total_dep_count %}<span class="badge">{{ deposits.count }}</span>{% endif %}
+            </a>
+            <a href="?type=withdrawals" class="sidebar-link {% if type_filter == 'withdrawals' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                Retraits
+                {% if total_wit_count %}<span class="badge">{{ withdrawals.count }}</span>{% endif %}
+            </a>
+            <a href="?type=stats" class="sidebar-link {% if type_filter == 'stats' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Statistiques
+            </a>
+            <a href="?type=calendar" class="sidebar-link {% if type_filter == 'calendar' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Calendrier
+                {% if total_pending %}<span class="badge pending-badge">{{ total_pending }}</span>{% endif %}
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{% url 'home' %}" class="sidebar-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1V10"/></svg>
+                Site public
+            </a>
+            <a href="{% url 'admin_logout' %}" class="sidebar-link sidebar-logout">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Déconnexion
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+        <header class="admin-header">
+            <div class="admin-header-left">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <div>
                     <h1>Dashboard</h1>
+                    <span class="header-date">{{ today|date:"l d F Y" }}</span>
                 </div>
-                <div class="admin-header-right">
-                    <span class="admin-user">{{ request.user.username }}</span>
+            </div>
+            <div class="admin-header-right">
+                <div class="header-today-pill">
+                    <span class="today-dot"></span>
+                    {{ today_count }} demande{{ today_count|pluralize }} aujourd'hui
                 </div>
-            </header>
+                <span class="admin-user">{{ request.user.username }}</span>
+            </div>
+        </header>
 
-            {% if messages %}
-            <div class="admin-messages">
-                {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                    <button onclick="this.parentElement.remove()">×</button>
+        {% if messages %}
+        <div class="admin-messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}<button onclick="this.parentElement.remove()">×</button></div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="admin-content">
+
+            <!-- ══ KPI CARDS ══ -->
+            <div class="kpi-grid">
+                <div class="kpi-card kpi-green">
+                    <div class="kpi-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+                    </div>
+                    <div class="kpi-body">
+                        <span class="kpi-label">Dépôts approuvés</span>
+                        <span class="kpi-value">{{ total_dep_amount|floatformat:0 }} <small>DJF</small></span>
+                        <span class="kpi-sub">{{ total_dep_count }} transaction{{ total_dep_count|pluralize }} — moy. {{ avg_dep|floatformat:0 }} DJF</span>
+                    </div>
                 </div>
-                {% endfor %}
+                <div class="kpi-card kpi-blue">
+                    <div class="kpi-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                    </div>
+                    <div class="kpi-body">
+                        <span class="kpi-label">Retraits approuvés</span>
+                        <span class="kpi-value">{{ total_wit_amount|floatformat:0 }} <small>DJF</small></span>
+                        <span class="kpi-sub">{{ total_wit_count }} transaction{{ total_wit_count|pluralize }} — moy. {{ avg_wit|floatformat:0 }} DJF</span>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-gold">
+                    <div class="kpi-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    </div>
+                    <div class="kpi-body">
+                        <span class="kpi-label">En attente</span>
+                        <span class="kpi-value">{{ total_pending }}</span>
+                        <span class="kpi-sub">{{ total_rejected }} rejeté{{ total_rejected|pluralize }} au total</span>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-purple">
+                    <div class="kpi-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    </div>
+                    <div class="kpi-body">
+                        <span class="kpi-label">Taux d'approbation</span>
+                        <span class="kpi-value">{{ approval_rate }}<small>%</small></span>
+                        <span class="kpi-sub">Volume net : {{ net_volume|floatformat:0 }} DJF</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ TODAY + WEEK ══ -->
+            <div class="mini-kpi-row">
+                <div class="mini-kpi">
+                    <span class="mini-label">Dépôts aujourd'hui</span>
+                    <span class="mini-value green">{{ today_dep_amount|floatformat:0 }} DJF</span>
+                </div>
+                <div class="mini-kpi">
+                    <span class="mini-label">Retraits aujourd'hui</span>
+                    <span class="mini-value blue">{{ today_wit_amount|floatformat:0 }} DJF</span>
+                </div>
+                <div class="mini-kpi">
+                    <span class="mini-label">Dépôts cette semaine</span>
+                    <span class="mini-value green">{{ week_dep|floatformat:0 }} DJF</span>
+                </div>
+                <div class="mini-kpi">
+                    <span class="mini-label">Retraits cette semaine</span>
+                    <span class="mini-value blue">{{ week_wit|floatformat:0 }} DJF</span>
+                </div>
+            </div>
+
+            <!-- ══ STATS VIEW ══ -->
+            {% if type_filter == 'stats' or type_filter == 'all' or not type_filter %}
+            <div class="charts-grid">
+                <!-- Line chart: 30 days -->
+                <div class="chart-card chart-wide">
+                    <div class="chart-header">
+                        <h3>Volume des 30 derniers jours</h3>
+                        <div class="chart-legend">
+                            <span class="leg-dot leg-green"></span>Dépôts
+                            <span class="leg-dot leg-blue"></span>Retraits
+                        </div>
+                    </div>
+                    <canvas id="lineChart" height="90"></canvas>
+                </div>
+
+                <!-- Donut: status -->
+                <div class="chart-card">
+                    <div class="chart-header"><h3>Répartition des statuts</h3></div>
+                    <canvas id="statusChart" height="200"></canvas>
+                    <div class="donut-legend">
+                        <div><span class="leg-dot leg-green"></span> Approuvé : <strong>{{ status_approved }}</strong></div>
+                        <div><span class="leg-dot leg-gold"></span> En attente : <strong>{{ status_pending }}</strong></div>
+                        <div><span class="leg-dot leg-red"></span> Rejeté : <strong>{{ status_rejected }}</strong></div>
+                    </div>
+                </div>
+
+                <!-- Bar: by wallet -->
+                <div class="chart-card chart-wide">
+                    <div class="chart-header">
+                        <h3>Volume approuvé par wallet</h3>
+                        <div class="chart-legend">
+                            <span class="leg-dot leg-green"></span>Dépôts
+                            <span class="leg-dot leg-blue"></span>Retraits
+                        </div>
+                    </div>
+                    <canvas id="walletChart" height="100"></canvas>
+                </div>
             </div>
             {% endif %}
 
-            <div class="admin-content">
-                <div class="stats-grid">
-                    <div class="stat-card stat-card-green">
-                        <div class="stat-label">Dépôts approuvés</div>
-                        <div class="stat-value">{{ total_deposits_amount|floatformat:0 }} DJF</div>
-                        <div class="stat-count">{{ total_deposits_count }} transaction{{ total_deposits_count|pluralize }}</div>
-                    </div>
-                    <div class="stat-card stat-card-blue">
-                        <div class="stat-label">Retraits approuvés</div>
-                        <div class="stat-value">{{ total_withdrawals_amount|floatformat:0 }} DJF</div>
-                        <div class="stat-count">{{ total_withdrawals_count }} transaction{{ total_withdrawals_count|pluralize }}</div>
-                    </div>
-                    <div class="stat-card stat-card-orange">
-                        <div class="stat-label">En attente</div>
-                        <div class="stat-value">{{ total_pending }}</div>
-                        <div class="stat-count">demande{{ total_pending|pluralize }} à traiter</div>
+            <!-- ══ CALENDAR VIEW ══ -->
+            {% if type_filter == 'calendar' or type_filter == 'all' or not type_filter %}
+            <div class="admin-section">
+                <div class="section-title-row">
+                    <h2>Calendrier des transactions</h2>
+                    <div class="cal-nav">
+                        <a href="?type={{ type_filter }}&cal_year={{ cal_prev_year }}&cal_month={{ cal_prev_month }}" class="cal-nav-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                        </a>
+                        <span class="cal-month-label">{{ cal_month_name }} {{ cal_year }}</span>
+                        <a href="?type={{ type_filter }}&cal_year={{ cal_next_year }}&cal_month={{ cal_next_month }}" class="cal-nav-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                        </a>
                     </div>
                 </div>
-
-                <div class="filters-bar">
-                    <form method="get" class="filters-form">
-                        <input type="hidden" name="type" value="{{ type_filter }}">
-                        <div class="filter-group">
-                            <label>Wallet</label>
-                            <select name="wallet" class="filter-select" onchange="this.form.submit()">
-                                <option value="">Tous les wallets</option>
-                                {% for key, info in wallet_info.items %}
-                                <option value="{{ key }}" {% if wallet_filter == key %}selected{% endif %}>{{ info.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Statut</label>
-                            <select name="status" class="filter-select" onchange="this.form.submit()">
-                                <option value="">Tous les statuts</option>
-                                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>En attente</option>
-                                <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approuvé</option>
-                                <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejeté</option>
-                            </select>
-                        </div>
-                        {% if wallet_filter or status_filter %}
-                        <a href="?type={{ type_filter }}" class="filter-reset">Réinitialiser</a>
-                        {% endif %}
-                    </form>
+                <div class="calendar-wrap">
+                    <div class="calendar-grid">
+                        <div class="cal-header-cell">Lun</div>
+                        <div class="cal-header-cell">Mar</div>
+                        <div class="cal-header-cell">Mer</div>
+                        <div class="cal-header-cell">Jeu</div>
+                        <div class="cal-header-cell">Ven</div>
+                        <div class="cal-header-cell">Sam</div>
+                        <div class="cal-header-cell">Dim</div>
+                        {% for week in cal_weeks %}
+                            {% for cell in week %}
+                                {% if cell.day %}
+                                <div class="cal-cell {% if cell.is_today %}cal-today{% endif %} {% if cell.total > 0 %}cal-has-tx{% endif %} {% if cell.total > 5 %}cal-hot{% endif %}">
+                                    <span class="cal-day-num">{{ cell.day }}</span>
+                                    {% if cell.deposits > 0 %}
+                                    <span class="cal-pill cal-pill-dep" title="{{ cell.deposits }} dépôt{{ cell.deposits|pluralize }}">
+                                        +{{ cell.deposits }}
+                                    </span>
+                                    {% endif %}
+                                    {% if cell.withdrawals > 0 %}
+                                    <span class="cal-pill cal-pill-wit" title="{{ cell.withdrawals }} retrait{{ cell.withdrawals|pluralize }}">
+                                        -{{ cell.withdrawals }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                {% else %}
+                                <div class="cal-cell cal-empty"></div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                    <div class="cal-legend">
+                        <span><span class="cal-pill cal-pill-dep">+N</span> Dépôts</span>
+                        <span><span class="cal-pill cal-pill-wit">-N</span> Retraits</span>
+                        <span class="cal-today-ex">Aujourd'hui</span>
+                    </div>
                 </div>
+            </div>
+            {% endif %}
 
-                {% if type_filter != 'withdrawals' %}
-                <section class="admin-section">
-                    <div class="section-title-row">
-                        <h2>Demandes de dépôt</h2>
-                        <span class="count-badge">{{ deposits.count }}</span>
+            <!-- ══ FILTERS ══ -->
+            {% if type_filter != 'stats' and type_filter != 'calendar' %}
+            <div class="filters-bar">
+                <form method="get" class="filters-form">
+                    <input type="hidden" name="type" value="{{ type_filter }}">
+                    <div class="filter-group">
+                        <label>Wallet</label>
+                        <select name="wallet" class="filter-select" onchange="this.form.submit()">
+                            <option value="">Tous</option>
+                            {% for key, info in wallet_info.items %}
+                            <option value="{{ key }}" {% if wallet_filter == key %}selected{% endif %}>{{ info.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-
-                    {% if deposits %}
-                    <div class="requests-table-wrap">
-                        <table class="requests-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>ID 1xbet</th>
-                                    <th>Téléphone</th>
-                                    <th>Wallet</th>
-                                    <th>Transaction ID</th>
-                                    <th>Montant</th>
-                                    <th>Capture</th>
-                                    <th>Date</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for dep in deposits %}
-                                <tr class="request-row status-row-{{ dep.status }}">
-                                    <td class="td-id">{{ dep.pk }}</td>
-                                    <td><strong>{{ dep.user_id }}</strong></td>
-                                    <td>{{ dep.phone_number }}</td>
-                                    <td>
-                                        <span class="wallet-tag wallet-{{ dep.wallet }}">{{ dep.get_wallet_display }}</span>
-                                    </td>
-                                    <td class="td-txid">{{ dep.transaction_id }}</td>
-                                    <td class="td-amount"><strong>{{ dep.amount|floatformat:0 }} DJF</strong></td>
-                                    <td>
-                                        {% if dep.screenshot %}
-                                        <a href="{{ dep.screenshot.url }}" target="_blank" class="screenshot-link">Voir</a>
-                                        {% else %}—{% endif %}
-                                    </td>
-                                    <td class="td-date">{{ dep.created_at|date:"d/m/Y H:i" }}</td>
-                                    <td>
-                                        <span class="status-badge status-{{ dep.status }}">{{ dep.get_status_display }}</span>
-                                        {% if dep.admin_note %}
-                                        <div class="admin-note-preview" title="{{ dep.admin_note }}">Note</div>
-                                        {% endif %}
-                                    </td>
-                                    <td class="td-actions">
-                                        {% if dep.status == 'pending' %}
-                                        <button class="btn-action btn-approve" onclick="openModal('deposit', {{ dep.pk }}, 'approved')">Approuver</button>
-                                        <button class="btn-action btn-reject" onclick="openModal('deposit', {{ dep.pk }}, 'rejected')">Rejeter</button>
-                                        {% else %}
-                                        <span class="action-done">Traité</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="filter-group">
+                        <label>Statut</label>
+                        <select name="status" class="filter-select" onchange="this.form.submit()">
+                            <option value="">Tous</option>
+                            <option value="pending"  {% if status_filter == 'pending'  %}selected{% endif %}>En attente</option>
+                            <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approuvé</option>
+                            <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejeté</option>
+                        </select>
                     </div>
-                    {% else %}
-                    <div class="empty-state">Aucune demande de dépôt</div>
+                    {% if wallet_filter or status_filter %}
+                    <a href="?type={{ type_filter }}" class="filter-reset">Réinitialiser</a>
                     {% endif %}
-                </section>
-                {% endif %}
+                </form>
+            </div>
+            {% endif %}
 
-                {% if type_filter != 'deposits' %}
-                <section class="admin-section">
-                    <div class="section-title-row">
-                        <h2>Demandes de retrait</h2>
-                        <span class="count-badge">{{ withdrawals.count }}</span>
-                    </div>
-
-                    {% if withdrawals %}
-                    <div class="requests-table-wrap">
-                        <table class="requests-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>ID 1xbet</th>
-                                    <th>Code retrait</th>
-                                    <th>Montant</th>
-                                    <th>Wallet</th>
-                                    <th>Numéro wallet</th>
-                                    <th>Date</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for w in withdrawals %}
-                                <tr class="request-row status-row-{{ w.status }}">
-                                    <td class="td-id">{{ w.pk }}</td>
-                                    <td><strong>{{ w.user_id }}</strong></td>
-                                    <td class="td-txid">{{ w.withdrawal_code }}</td>
-                                    <td class="td-amount"><strong>{{ w.amount|floatformat:0 }} DJF</strong></td>
-                                    <td>
-                                        <span class="wallet-tag wallet-{{ w.wallet }}">{{ w.get_wallet_display }}</span>
-                                    </td>
-                                    <td>{{ w.wallet_number }}</td>
-                                    <td class="td-date">{{ w.created_at|date:"d/m/Y H:i" }}</td>
-                                    <td>
-                                        <span class="status-badge status-{{ w.status }}">{{ w.get_status_display }}</span>
-                                        {% if w.admin_note %}
-                                        <div class="admin-note-preview" title="{{ w.admin_note }}">Note</div>
-                                        {% endif %}
-                                    </td>
-                                    <td class="td-actions">
-                                        {% if w.status == 'pending' %}
-                                        <button class="btn-action btn-approve" onclick="openModal('withdrawal', {{ w.pk }}, 'approved')">Approuver</button>
-                                        <button class="btn-action btn-reject" onclick="openModal('withdrawal', {{ w.pk }}, 'rejected')">Rejeter</button>
-                                        {% else %}
-                                        <span class="action-done">Traité</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="empty-state">Aucune demande de retrait</div>
-                    {% endif %}
-                </section>
+            <!-- ══ DEPOSITS TABLE ══ -->
+            {% if type_filter != 'withdrawals' and type_filter != 'stats' and type_filter != 'calendar' %}
+            <div class="admin-section">
+                <div class="section-title-row">
+                    <h2>Demandes de dépôt</h2>
+                    <span class="count-badge">{{ deposits.count }}</span>
+                </div>
+                {% if deposits %}
+                <div class="requests-table-wrap">
+                    <table class="requests-table">
+                        <thead>
+                            <tr>
+                                <th>#</th><th>ID 1xbet</th><th>Téléphone</th><th>Wallet</th>
+                                <th>Transaction ID</th><th>Montant</th><th>Capture</th>
+                                <th>Date</th><th>Statut</th><th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dep in deposits %}
+                            <tr class="request-row status-row-{{ dep.status }}">
+                                <td class="td-id">#{{ dep.pk }}</td>
+                                <td><strong>{{ dep.user_id }}</strong></td>
+                                <td>{{ dep.phone_number }}</td>
+                                <td><span class="wallet-tag wallet-{{ dep.wallet }}">{{ dep.get_wallet_display }}</span></td>
+                                <td class="td-txid" title="{{ dep.transaction_id }}">{{ dep.transaction_id }}</td>
+                                <td class="td-amount">{{ dep.amount|floatformat:0 }} DJF</td>
+                                <td>
+                                    {% if dep.screenshot %}
+                                    <a href="{{ dep.screenshot.url }}" target="_blank" class="screenshot-link">Voir</a>
+                                    {% else %}—{% endif %}
+                                </td>
+                                <td class="td-date">{{ dep.created_at|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ dep.status }}">{{ dep.get_status_display }}</span>
+                                    {% if dep.admin_note %}<div class="admin-note-preview" title="{{ dep.admin_note }}">Note</div>{% endif %}
+                                </td>
+                                <td class="td-actions">
+                                    {% if dep.status == 'pending' %}
+                                    <button class="btn-action btn-approve" onclick="openModal('deposit',{{ dep.pk }},'approved')">Approuver</button>
+                                    <button class="btn-action btn-reject"  onclick="openModal('deposit',{{ dep.pk }},'rejected')">Rejeter</button>
+                                    {% else %}<span class="action-done">Traité</span>{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">Aucune demande de dépôt</div>
                 {% endif %}
             </div>
-        </main>
-    </div>
+            {% endif %}
 
-    <div class="modal-overlay" id="action-modal" style="display:none;" onclick="closeModal(event)">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3 id="modal-title">Confirmer l'action</h3>
-                <button class="modal-close" onclick="closeModalBtn()">×</button>
-            </div>
-            <div class="modal-body">
-                <p id="modal-desc"></p>
-                <div class="form-group">
-                    <label class="form-label">Note (optionnel)</label>
-                    <textarea class="form-input" id="modal-note" rows="3" placeholder="Raison ou commentaire..."></textarea>
+            <!-- ══ WITHDRAWALS TABLE ══ -->
+            {% if type_filter != 'deposits' and type_filter != 'stats' and type_filter != 'calendar' %}
+            <div class="admin-section">
+                <div class="section-title-row">
+                    <h2>Demandes de retrait</h2>
+                    <span class="count-badge">{{ withdrawals.count }}</span>
                 </div>
+                {% if withdrawals %}
+                <div class="requests-table-wrap">
+                    <table class="requests-table">
+                        <thead>
+                            <tr>
+                                <th>#</th><th>ID 1xbet</th><th>Code retrait</th><th>Montant</th>
+                                <th>Wallet</th><th>Numéro</th><th>Date</th><th>Statut</th><th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for w in withdrawals %}
+                            <tr class="request-row status-row-{{ w.status }}">
+                                <td class="td-id">#{{ w.pk }}</td>
+                                <td><strong>{{ w.user_id }}</strong></td>
+                                <td class="td-txid" title="{{ w.withdrawal_code }}">{{ w.withdrawal_code }}</td>
+                                <td class="td-amount">{{ w.amount|floatformat:0 }} DJF</td>
+                                <td><span class="wallet-tag wallet-{{ w.wallet }}">{{ w.get_wallet_display }}</span></td>
+                                <td>{{ w.wallet_number }}</td>
+                                <td class="td-date">{{ w.created_at|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ w.status }}">{{ w.get_status_display }}</span>
+                                    {% if w.admin_note %}<div class="admin-note-preview" title="{{ w.admin_note }}">Note</div>{% endif %}
+                                </td>
+                                <td class="td-actions">
+                                    {% if w.status == 'pending' %}
+                                    <button class="btn-action btn-approve" onclick="openModal('withdrawal',{{ w.pk }},'approved')">Approuver</button>
+                                    <button class="btn-action btn-reject"  onclick="openModal('withdrawal',{{ w.pk }},'rejected')">Rejeter</button>
+                                    {% else %}<span class="action-done">Traité</span>{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">Aucune demande de retrait</div>
+                {% endif %}
             </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeModalBtn()">Annuler</button>
-                <button class="btn-confirm" id="modal-confirm-btn" onclick="confirmAction()">Confirmer</button>
-            </div>
-            <form id="action-form" method="post" style="display:none;">
-                {% csrf_token %}
-                <input type="hidden" name="action" id="form-action">
-                <input type="hidden" name="note" id="form-note">
-                <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            </form>
+            {% endif %}
+
+        </div><!-- /admin-content -->
+    </main>
+</div>
+
+<!-- ══ ACTION MODAL ══ -->
+<div class="modal-overlay" id="action-modal" style="display:none;" onclick="closeModal(event)">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 id="modal-title">Confirmer l'action</h3>
+            <button class="modal-close" onclick="closeModalBtn()">×</button>
         </div>
+        <div class="modal-body">
+            <p id="modal-desc"></p>
+            <div class="form-group">
+                <label class="form-label">Note (optionnel)</label>
+                <textarea class="form-input" id="modal-note" rows="3" placeholder="Raison ou commentaire..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModalBtn()">Annuler</button>
+            <button class="btn-confirm" id="modal-confirm-btn" onclick="confirmAction()">Confirmer</button>
+        </div>
+        <form id="action-form" method="post" style="display:none;">
+            {% csrf_token %}
+            <input type="hidden" name="action" id="form-action">
+            <input type="hidden" name="note"   id="form-note">
+            <input type="hidden" name="next"   value="{{ request.get_full_path }}">
+        </form>
     </div>
+</div>
 
-    <script src="{% static 'js/main.js' %}"></script>
-    <script src="{% static 'js/admin.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+<script src="{% static 'js/admin.js' %}"></script>
+<script>
+// ── Chart.js global defaults ──────────────────────────────────────────────
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.font.family = 'Inter';
+Chart.defaults.font.size = 12;
+
+const GOLD  = '#d4a840';
+const GREEN = '#10b981';
+const BLUE  = '#3b7ef5';
+const RED   = '#ef4444';
+const GRID  = 'rgba(255,255,255,0.05)';
+
+// ── Line chart ────────────────────────────────────────────────────────────
+const lineEl = document.getElementById('lineChart');
+if (lineEl) {
+    new Chart(lineEl, {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [
+                {
+                    label: 'Dépôts (DJF)',
+                    data: {{ chart_dep_data|safe }},
+                    borderColor: GREEN,
+                    backgroundColor: 'rgba(16,185,129,0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3,
+                    pointBackgroundColor: GREEN,
+                    borderWidth: 2,
+                },
+                {
+                    label: 'Retraits (DJF)',
+                    data: {{ chart_wit_data|safe }},
+                    borderColor: BLUE,
+                    backgroundColor: 'rgba(59,126,245,0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3,
+                    pointBackgroundColor: BLUE,
+                    borderWidth: 2,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: GRID }, ticks: { maxTicksLimit: 10 } },
+                y: { grid: { color: GRID }, beginAtZero: true, ticks: { callback: v => v.toLocaleString() + ' DJF' } }
+            }
+        }
+    });
+}
+
+// ── Status donut ──────────────────────────────────────────────────────────
+const statusEl = document.getElementById('statusChart');
+if (statusEl) {
+    new Chart(statusEl, {
+        type: 'doughnut',
+        data: {
+            labels: ['Approuvé', 'En attente', 'Rejeté'],
+            datasets: [{
+                data: [{{ status_approved }}, {{ status_pending }}, {{ status_rejected }}],
+                backgroundColor: [GREEN, GOLD, RED],
+                borderWidth: 0,
+                hoverOffset: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '72%',
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+// ── Wallet bar chart ──────────────────────────────────────────────────────
+const walletEl = document.getElementById('walletChart');
+if (walletEl) {
+    new Chart(walletEl, {
+        type: 'bar',
+        data: {
+            labels: {{ wallet_labels|safe }},
+            datasets: [
+                {
+                    label: 'Dépôts (DJF)',
+                    data: {{ wallet_dep_ser|safe }},
+                    backgroundColor: 'rgba(16,185,129,0.7)',
+                    borderRadius: 6,
+                    borderSkipped: false,
+                },
+                {
+                    label: 'Retraits (DJF)',
+                    data: {{ wallet_wit_ser|safe }},
+                    backgroundColor: 'rgba(59,126,245,0.7)',
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { grid: { color: GRID }, beginAtZero: true, ticks: { callback: v => v.toLocaleString() } }
+            }
+        }
+    });
+}
+</script>
 </body>
 </html>

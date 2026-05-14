@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accueil — Mahamoud Hassan Échange Expresse{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+        <div class="hero-badge">Service officiel 1xbet Djibouti</div>
+        <h1 class="hero-title">
+            Mahamoud Hassan<br>
+            <span class="hero-accent">Échange Expresse</span>
+        </h1>
+        <p class="hero-description">
+            Rechargez votre compte 1xbet rapidement et en toute sécurité.<br>
+            Dépôt et retrait via Waafi, CAC, D-Money et Saba.
+        </p>
+        <div class="hero-actions">
+            <a href="{% url 'deposit' %}" class="btn-hero btn-deposit-hero">
+                <div class="btn-hero-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M12 5v14M5 12l7 7 7-7"/>
+                    </svg>
+                </div>
+                <div class="btn-hero-text">
+                    <span class="btn-hero-label">Dépôt</span>
+                    <span class="btn-hero-desc">Recharger mon compte</span>
+                </div>
+            </a>
+            <a href="{% url 'withdrawal' %}" class="btn-hero btn-withdrawal-hero">
+                <div class="btn-hero-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M12 19V5M5 12l7-7 7 7"/>
+                    </svg>
+                </div>
+                <div class="btn-hero-text">
+                    <span class="btn-hero-label">Retrait</span>
+                    <span class="btn-hero-desc">Retirer mes gains</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="wallets-section">
+    <div class="section-container">
+        <div class="section-header">
+            <h2>Wallets acceptés</h2>
+            <p>Nous acceptons les 4 principales plateformes de paiement mobile à Djibouti</p>
+        </div>
+        <div class="wallets-grid">
+            <div class="wallet-card">
+                <img src="{% static 'images/wallet/waafi.webp' %}" alt="Waafi" class="wallet-card-img">
+                <div class="wallet-card-info">
+                    <h3>Waafi</h3>
+                    <p>77 15 74 92</p>
+                </div>
+            </div>
+            <div class="wallet-card">
+                <img src="{% static 'images/wallet/cac.webp' %}" alt="CAC" class="wallet-card-img">
+                <div class="wallet-card-info">
+                    <h3>CAC</h3>
+                    <p>77 15 14 89</p>
+                </div>
+            </div>
+            <div class="wallet-card">
+                <img src="{% static 'images/wallet/d-money.webp' %}" alt="D-Money" class="wallet-card-img">
+                <div class="wallet-card-info">
+                    <h3>D-Money</h3>
+                    <p>77 15 74 92</p>
+                </div>
+            </div>
+            <div class="wallet-card">
+                <img src="{% static 'images/wallet/saba.webp' %}" alt="Saba" class="wallet-card-img">
+                <div class="wallet-card-info">
+                    <h3>Saba</h3>
+                    <p>118 762 58</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="how-it-works">
+    <div class="section-container">
+        <div class="section-header">
+            <h2>Comment ça marche ?</h2>
+            <p>Un processus simple en 3 étapes</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">01</div>
+                <h3>Envoyez l'argent</h3>
+                <p>Transférez le montant souhaité vers l'un de nos wallets via Waafi, CAC, D-Money ou Saba.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">02</div>
+                <h3>Soumettez votre demande</h3>
+                <p>Remplissez le formulaire de dépôt avec votre ID 1xbet, l'ID de transaction et la capture d'écran.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">03</div>
+                <h3>Recevez votre crédit</h3>
+                <p>Votre compte 1xbet sera crédité rapidement après vérification de votre transaction.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

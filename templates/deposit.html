@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dépôt — Mahamoud Hassan Échange Expresse{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <a href="{% url 'home' %}" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M5 12l7 7M5 12l7-7"/></svg>
+            Retour
+        </a>
+        <h1>Dépôt</h1>
+        <p>Rechargez votre compte 1xbet via nos wallets</p>
+    </div>
+</div>
+
+<div class="deposit-page">
+    <div class="wallets-panel">
+        <h2 class="panel-title">Choisissez un wallet et envoyez l'argent</h2>
+        <p class="panel-desc">Sélectionnez un wallet, effectuez le transfert, puis remplissez le formulaire ci-dessous.</p>
+
+        <div class="wallet-options">
+            <div class="wallet-option" data-wallet="waafi" onclick="selectWallet('waafi')">
+                <div class="wallet-option-header">
+                    <img src="{% static 'images/wallet/waafi.webp' %}" alt="Waafi" class="wallet-opt-img">
+                    <div class="wallet-opt-badge">Waafi</div>
+                </div>
+                <div class="wallet-opt-details">
+                    <div class="wallet-detail-row">
+                        <span class="detail-label">Numéro</span>
+                        <span class="detail-value" id="waafi-num">77 15 74 92</span>
+                        <button class="copy-btn" onclick="copyText(event, '77 15 74 92')">Copier</button>
+                    </div>
+                    <div class="wallet-detail-row">
+                        <span class="detail-label">Nom</span>
+                        <span class="detail-value">Mohamed Hassan Mouhoumed</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wallet-option" data-wallet="cac" onclick="selectWallet('cac')">
+                <div class="wallet-option-header">
+                    <img src="{% static 'images/wallet/cac.webp' %}" alt="CAC" class="wallet-opt-img">
+                    <div class="wallet-opt-badge">CAC</div>
+                </div>
+                <div class="wallet-opt-details">
+                    <div class="wallet-detail-row">
+                        <span class="detail-label">Numéro</span>
+                        <span class="detail-value">77 15 14 89</span>
+                        <button class="copy-btn" onclick="copyText(event, '77 15 14 89')">Copier</button>
+                    </div>
+                    <div class="wallet-detail-row">
+                        <span class="detail-label">Nom</span>
+                        <span class="detail-value">Abdou-Hakim Elmi Moussa</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wallet-option" data-wallet="d-money" onclick="selectWallet('d-money')">
+                <div class="wallet-option-header">
+                    <img src="{% static 'images/wallet/d-money.webp' %}" alt="D-Money" class="wallet-opt-img">
+                    <div class="wallet-opt-badge">D-Money</div>
+                </div>
+                <div class="wallet-opt-details">
+                    <div class="wallet-detail-row">
+                        <span class="detail-label">Numéro</span>
+                        <span class="detail-value">77 15 74 92</span>
+                        <button class="copy-btn" onclick="copyText(event, '77 15 74 92')">Copier</button>
+                    </div>
+                    <div class="wallet-detail-row">
+                        <span class="detail-label">Nom</span>
+                        <span class="detail-value">Mohamed Hassan Mouhoumed</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wallet-option" data-wallet="saba" onclick="selectWallet('saba')">
+                <div class="wallet-option-header">
+                    <img src="{% static 'images/wallet/saba.webp' %}" alt="Saba" class="wallet-opt-img">
+                    <div class="wallet-opt-badge">Saba</div>
+                </div>
+                <div class="wallet-opt-details">
+                    <div class="wallet-detail-row">
+                        <span class="detail-label">Numéro</span>
+                        <span class="detail-value">118 762 58</span>
+                        <button class="copy-btn" onclick="copyText(event, '118 762 58')">Copier</button>
+                    </div>
+                    <div class="wallet-detail-row">
+                        <span class="detail-label">Nom</span>
+                        <span class="detail-value">Mohamed Hassan Mouhoumed</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-panel">
+        <h2 class="panel-title">Confirmer votre dépôt</h2>
+        <p class="panel-desc">Remplissez ce formulaire après avoir effectué le transfert.</p>
+
+        <form method="post" enctype="multipart/form-data" class="deposit-form" id="deposit-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.user_id.id_for_label }}">
+                    ID Utilisateur 1xbet
+                </label>
+                {{ form.user_id }}
+                {% if form.user_id.errors %}
+                <div class="field-error">{{ form.user_id.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.phone_number.id_for_label }}">
+                    Votre numéro de téléphone
+                </label>
+                {{ form.phone_number }}
+                {% if form.phone_number.errors %}
+                <div class="field-error">{{ form.phone_number.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.wallet.id_for_label }}">
+                    Wallet utilisé pour l'envoi
+                </label>
+                {{ form.wallet }}
+                {% if form.wallet.errors %}
+                <div class="field-error">{{ form.wallet.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.transaction_id.id_for_label }}">
+                    ID de transaction
+                </label>
+                {{ form.transaction_id }}
+                {% if form.transaction_id.errors %}
+                <div class="field-error">{{ form.transaction_id.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.amount.id_for_label }}">
+                    Montant envoyé (DJF)
+                </label>
+                {{ form.amount }}
+                {% if form.amount.errors %}
+                <div class="field-error">{{ form.amount.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Capture d'écran de la transaction
+                </label>
+                <div class="file-upload-area" id="file-upload-area">
+                    <div class="file-upload-inner">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                        </svg>
+                        <p class="upload-text">Glissez votre image ici ou <span class="upload-link">parcourez</span></p>
+                        <p class="upload-hint">PNG, JPG, JPEG — Max 10MB</p>
+                        {{ form.screenshot }}
+                    </div>
+                    <div class="file-preview" id="file-preview" style="display:none;">
+                        <img id="preview-img" src="" alt="Aperçu">
+                        <button type="button" class="remove-file" onclick="removeFile()">×</button>
+                    </div>
+                </div>
+                {% if form.screenshot.errors %}
+                <div class="field-error">{{ form.screenshot.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn-submit">
+                Confirmer le dépôt
+            </button>
+
+            <p class="form-note">
+                Après validation, votre compte 1xbet sera crédité dans les plus brefs délais.
+            </p>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function selectWallet(walletKey) {
+    document.querySelectorAll('.wallet-option').forEach(el => el.classList.remove('active'));
+    const selected = document.querySelector('[data-wallet="' + walletKey + '"]');
+    if (selected) selected.classList.add('active');
+    const selectEl = document.querySelector('select[name="wallet"]');
+    if (selectEl) selectEl.value = walletKey;
+}
+
+function copyText(e, text) {
+    e.stopPropagation();
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = e.target;
+        btn.textContent = 'Copié !';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+    });
+}
+
+const fileInput = document.querySelector('input[type="file"]');
+const uploadArea = document.getElementById('file-upload-area');
+const filePreview = document.getElementById('file-preview');
+const previewImg = document.getElementById('preview-img');
+
+if (fileInput) {
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                filePreview.style.display = 'block';
+                uploadArea.querySelector('.file-upload-inner').style.display = 'none';
+            };
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+}
+
+function removeFile() {
+    fileInput.value = '';
+    filePreview.style.display = 'none';
+    uploadArea.querySelector('.file-upload-inner').style.display = 'flex';
+}
+
+['dragenter', 'dragover'].forEach(e => uploadArea && uploadArea.addEventListener(e, () => uploadArea.classList.add('drag-over')));
+['dragleave', 'drop'].forEach(e => uploadArea && uploadArea.addEventListener(e, () => uploadArea.classList.remove('drag-over')));
+uploadArea && uploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && fileInput) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        fileInput.dispatchEvent(new Event('change'));
+    }
+});
+</script>
+{% endblock %}

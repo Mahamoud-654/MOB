@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dépôt confirmé — Mahamoud Hassan Échange Expresse{% endblock %}
+
+{% block content %}
+<div class="success-page">
+    <div class="success-card">
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5"/>
+            </svg>
+        </div>
+        <h1>Demande envoyée !</h1>
+        <p class="success-message">
+            Votre demande de dépôt a bien été reçue. Votre compte 1xbet sera crédité de
+            <strong>{{ deposit.amount|floatformat:0 }} DJF</strong> dès que notre équipe aura validé votre transaction.
+        </p>
+
+        <div class="success-details">
+            <div class="success-detail-row">
+                <span>Référence</span>
+                <span>#{{ deposit.pk }}</span>
+            </div>
+            <div class="success-detail-row">
+                <span>ID 1xbet</span>
+                <span>{{ deposit.user_id }}</span>
+            </div>
+            <div class="success-detail-row">
+                <span>Wallet</span>
+                <span>{{ deposit.get_wallet_display }}</span>
+            </div>
+            <div class="success-detail-row">
+                <span>Montant</span>
+                <span>{{ deposit.amount|floatformat:0 }} DJF</span>
+            </div>
+            <div class="success-detail-row">
+                <span>Statut</span>
+                <span class="status-badge status-pending">En attente</span>
+            </div>
+        </div>
+
+        <div class="success-note">
+            <strong>Note importante :</strong> Conservez votre numéro de référence <strong>#{{ deposit.pk }}</strong>
+            pour tout suivi de votre demande.
+        </div>
+
+        <div class="success-actions">
+            <a href="{% url 'deposit' %}" class="btn-secondary">Nouveau dépôt</a>
+            <a href="{% url 'home' %}" class="btn-primary">Retour à l'accueil</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

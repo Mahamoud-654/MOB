@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Retrait confirmé — Mahamoud Hassan Échange Expresse{% endblock %}
+
+{% block content %}
+<div class="success-page">
+    <div class="success-card success-card-withdrawal">
+        <div class="success-icon success-icon-withdrawal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5"/>
+            </svg>
+        </div>
+        <h1>Demande reçue !</h1>
+        <p class="success-message">
+            Votre demande de retrait de <strong>{{ withdrawal.amount|floatformat:0 }} DJF</strong>
+            a bien été enregistrée. Votre argent sera envoyé sur votre wallet
+            <strong>{{ withdrawal.get_wallet_display }}</strong> dans les 15 à 30 minutes.
+        </p>
+
+        <div class="success-details">
+            <div class="success-detail-row">
+                <span>Référence</span>
+                <span>#{{ withdrawal.pk }}</span>
+            </div>
+            <div class="success-detail-row">
+                <span>ID 1xbet</span>
+                <span>{{ withdrawal.user_id }}</span>
+            </div>
+            <div class="success-detail-row">
+                <span>Wallet</span>
+                <span>{{ withdrawal.get_wallet_display }}</span>
+            </div>
+            <div class="success-detail-row">
+                <span>Numéro</span>
+                <span>{{ withdrawal.wallet_number }}</span>
+            </div>
+            <div class="success-detail-row">
+                <span>Montant</span>
+                <span>{{ withdrawal.amount|floatformat:0 }} DJF</span>
+            </div>
+            <div class="success-detail-row">
+                <span>Statut</span>
+                <span class="status-badge status-pending">En attente</span>
+            </div>
+        </div>
+
+        <div class="success-note">
+            <strong>Note :</strong> Conservez votre numéro de référence <strong>#{{ withdrawal.pk }}</strong>.
+            En cas de problème, contactez-nous avec ce numéro.
+        </div>
+
+        <div class="success-actions">
+            <a href="{% url 'withdrawal' %}" class="btn-secondary">Nouveau retrait</a>
+            <a href="{% url 'home' %}" class="btn-primary">Retour à l'accueil</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

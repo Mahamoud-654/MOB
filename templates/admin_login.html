@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Admin — MH Échange</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="admin-login-body">
+    <div class="admin-login-page">
+        <div class="admin-login-card">
+            <div class="admin-login-header">
+                <div class="admin-brand-logo">MH</div>
+                <h1>Espace Administrateur</h1>
+                <p>Mahamoud Hassan Échange Expresse</p>
+            </div>
+
+            {% if messages %}
+            <div class="messages-inline">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" class="admin-login-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Nom d'utilisateur</label>
+                    <input type="text" name="username" class="form-input" placeholder="Administrateur" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" name="password" class="form-input" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-submit">Se connecter</button>
+            </form>
+
+            <a href="{% url 'home' %}" class="back-to-site">Retour au site</a>
+        </div>
+    </div>
+</body>
+</html>

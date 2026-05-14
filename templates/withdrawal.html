@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Retrait — Mahamoud Hassan Échange Expresse{% endblock %}
+
+{% block content %}
+<div class="page-header page-header-withdrawal">
+    <div class="page-header-content">
+        <a href="{% url 'home' %}" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M5 12l7 7M5 12l7-7"/></svg>
+            Retour
+        </a>
+        <h1>Retrait</h1>
+        <p>Retirez vos gains 1xbet sur votre wallet mobile</p>
+    </div>
+</div>
+
+<div class="withdrawal-page">
+    <div class="withdrawal-info-panel">
+        <h2 class="panel-title">Comment effectuer un retrait</h2>
+        <div class="withdrawal-steps">
+            <div class="w-step">
+                <div class="w-step-num">1</div>
+                <div class="w-step-content">
+                    <h4>Générez le code de retrait</h4>
+                    <p>Sur votre compte 1xbet, demandez un retrait et copiez le code généré.</p>
+                </div>
+            </div>
+            <div class="w-step">
+                <div class="w-step-num">2</div>
+                <div class="w-step-content">
+                    <h4>Remplissez le formulaire</h4>
+                    <p>Entrez votre ID, le code de retrait, le montant et votre wallet de réception.</p>
+                </div>
+            </div>
+            <div class="w-step">
+                <div class="w-step-num">3</div>
+                <div class="w-step-content">
+                    <h4>Recevez votre argent</h4>
+                    <p>Nous traitons votre retrait et l'argent est envoyé sur votre wallet.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="wallets-mini-grid">
+            <div class="wallet-mini" onclick="selectWithdrawalWallet('waafi', '77 15 74 92')">
+                <img src="{% static 'images/wallet/waafi.webp' %}" alt="Waafi">
+                <span>Waafi</span>
+            </div>
+            <div class="wallet-mini" onclick="selectWithdrawalWallet('cac', '77 15 14 89')">
+                <img src="{% static 'images/wallet/cac.webp' %}" alt="CAC">
+                <span>CAC</span>
+            </div>
+            <div class="wallet-mini" onclick="selectWithdrawalWallet('d-money', '77 15 74 92')">
+                <img src="{% static 'images/wallet/d-money.webp' %}" alt="D-Money">
+                <span>D-Money</span>
+            </div>
+            <div class="wallet-mini" onclick="selectWithdrawalWallet('saba', '118 762 58')">
+                <img src="{% static 'images/wallet/saba.webp' %}" alt="Saba">
+                <span>Saba</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-panel">
+        <h2 class="panel-title">Formulaire de retrait</h2>
+        <p class="panel-desc">Remplissez tous les champs pour traiter votre retrait.</p>
+
+        <form method="post" class="withdrawal-form" id="withdrawal-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.user_id.id_for_label }}">
+                    ID Utilisateur 1xbet
+                </label>
+                {{ form.user_id }}
+                {% if form.user_id.errors %}
+                <div class="field-error">{{ form.user_id.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.withdrawal_code.id_for_label }}">
+                    Code de retrait 1xbet
+                </label>
+                {{ form.withdrawal_code }}
+                {% if form.withdrawal_code.errors %}
+                <div class="field-error">{{ form.withdrawal_code.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.amount.id_for_label }}">
+                    Montant à retirer (DJF)
+                </label>
+                {{ form.amount }}
+                {% if form.amount.errors %}
+                <div class="field-error">{{ form.amount.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.wallet.id_for_label }}">
+                        Wallet de réception
+                    </label>
+                    {{ form.wallet }}
+                    {% if form.wallet.errors %}
+                    <div class="field-error">{{ form.wallet.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.wallet_number.id_for_label }}">
+                        Numéro du wallet
+                    </label>
+                    {{ form.wallet_number }}
+                    {% if form.wallet_number.errors %}
+                    <div class="field-error">{{ form.wallet_number.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit btn-submit-withdrawal">
+                Soumettre la demande de retrait
+            </button>
+
+            <p class="form-note">
+                Votre retrait sera traité dans un délai de 15 à 30 minutes.
+            </p>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function selectWithdrawalWallet(walletKey, number) {
+    document.querySelectorAll('.wallet-mini').forEach(el => el.classList.remove('active'));
+    const walletMinis = document.querySelectorAll('.wallet-mini');
+    const walletMap = { 'waafi': 0, 'cac': 1, 'd-money': 2, 'saba': 3 };
+    if (walletMinis[walletMap[walletKey]]) {
+        walletMinis[walletMap[walletKey]].classList.add('active');
+    }
+    const selectEl = document.querySelector('#wallet-select');
+    if (selectEl) selectEl.value = walletKey;
+    const numEl = document.querySelector('#wallet-number');
+    if (numEl) { numEl.value = number; numEl.focus(); }
+}
+
+const walletSelect = document.querySelector('#wallet-select');
+if (walletSelect) {
+    walletSelect.addEventListener('change', function() {
+        const walletNumbers = { 'waafi': '77 15 74 92', 'cac': '77 15 14 89', 'd-money': '77 15 74 92', 'saba': '118 762 58' };
+        const numEl = document.querySelector('#wallet-number');
+        if (numEl && walletNumbers[this.value]) {
+            numEl.placeholder = 'Ex: ' + walletNumbers[this.value];
+        }
+    });
+}
+</script>
+{% endblock %}
